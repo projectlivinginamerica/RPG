@@ -1,13 +1,10 @@
-// -----------------------------------------------------------------------------------------
-// using classes
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-// -----------------------------------------------------------------------------------------
-// player movement class
 public class PlayerCharacter : BaseCharacter
 {
     // static public members
@@ -17,8 +14,6 @@ public class PlayerCharacter : BaseCharacter
 
     private float startAttackTime;
 
-    // -----------------------------------------------------------------------------------------
-    // awake method to initialisation
     void Awake()
     {
         instance = this;
@@ -29,8 +24,6 @@ public class PlayerCharacter : BaseCharacter
         animator.SetInteger("orientation", 4);
     }
 
-    // -----------------------------------------------------------------------------------------
-    // Update is called once per frame
     void Update()
     {
         if (CharacterState == eCharacterState.Idle)
@@ -62,8 +55,6 @@ public class PlayerCharacter : BaseCharacter
         }
     }
 
-    // -----------------------------------------------------------------------------------------
-    // fixed update methode
     void FixedUpdate()
     {
         if (CharacterState == eCharacterState.Idle || CharacterState == eCharacterState.Walking)
@@ -88,30 +79,11 @@ public class PlayerCharacter : BaseCharacter
             }
         }
 
-       // previousPosition = tf.position;
-
         animationUpdate();
     }
 
-    // Runs after the animation has done its work
     private void LateUpdate()
     {
         UpdateSpriteRenderers();
-    }
-
-    // -----------------------------------------------------------------------------------------
-    // Set the animation parameters
-    public void animationUpdate()
-    {
-Debug.Log("Animation update!");
-        animator.SetFloat("speed", Mathf.Abs(movement.x) + Mathf.Abs(movement.y));
-        if (movement.x > 0)
-            animator.SetInteger("orientation", 6);
-        if (movement.x < 0)
-            animator.SetInteger("orientation", 2);
-        if (movement.y > 0)
-            animator.SetInteger("orientation", 0);
-        if (movement.y < 0)
-            animator.SetInteger("orientation", 4);
     }
 }

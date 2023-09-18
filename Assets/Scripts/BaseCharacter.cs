@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using System;
 
 public enum eCharacterState
 {
@@ -14,6 +15,19 @@ public enum eCharacterState
     Attacking
 };
 
+[Serializable]
+public struct DamageFX
+{
+    public eDamageType damageType;
+    public GameObject[] prefabsToSpawn;
+    public bool isDeathFX;
+}
+
+public class BaseRPGObject : MonoBehaviour
+{
+
+}
+
 public class BaseProjectile : MonoBehaviour
 {
 
@@ -21,26 +35,19 @@ public class BaseProjectile : MonoBehaviour
 
 // -----------------------------------------------------------------------------------------
 // player movement class
-public class BaseCharacter : MonoBehaviour
+public class BaseCharacter : BaseRPGObject
 {
-    // -----------------------------------------------------------------------------------------
-    // public members
+    public float health = 100;
     public float walkSpeed = 1.0f;
-    public Transform tf;
     public Vector2 movement;
     public Animator animator;
     public SpriteRenderer spriteRenderer;
 
-    // The name of the sprite sheet to use
+    // Sprite Sheets
     public string WalkSpriteSheetName;
     public string AttackSpriteSheetName;
 
-    // -----------------------------------------------------------------------------------------
-    // private members
-    private Vector2 previousPosition;
-
-    // The name of the currently loaded sprite sheet
-    private string LoadedSpriteSheetName;
+    public DamageFX[] damageFXList;
 
     // The dictionary containing all the sliced up sprites in the sprite sheet
     private Dictionary<string, Sprite> WalkSpriteSheet;
@@ -52,35 +59,22 @@ public class BaseCharacter : MonoBehaviour
         protected set;
     }
 
-    // -----------------------------------------------------------------------------------------
-    // awake method to initialisation
     void Awake()
     {
-        previousPosition = tf.position;
-        //velocity = rb.velocity;
-        this.LoadSpriteSheet();
+        LoadSpriteSheet();
         animator.SetFloat("speed", 0);
         animator.SetInteger("orientation", 4);
     }
 
-    // -----------------------------------------------------------------------------------------
-    // Update is called once per frame
     void Update()
     {
     }
 
-    // -----------------------------------------------------------------------------------------
-    // fixed update methode
     void FixedUpdate()
     {
-
-
-       // previousPosition = tf.position;
-
         animationUpdate();
     }
 
-    // Runs after the animation has done its work
     protected void UpdateSpriteRenderers()
     {
         if (CharacterState == eCharacterState.Walking || CharacterState == eCharacterState.Idle)
@@ -93,44 +87,109 @@ public class BaseCharacter : MonoBehaviour
         }
     }
 
-    // -----------------------------------------------------------------------------------------
-    // Set the animation parameters
     public void animationUpdate()
     {
         animator.SetFloat("speed", Mathf.Abs(movement.x) + Mathf.Abs(movement.y));
         if (movement.x > 0)
+        {
             animator.SetInteger("orientation", 6);
+        }
+
         if (movement.x < 0)
+        {
             animator.SetInteger("orientation", 2);
+        }
+
         if (movement.y > 0)
+        {
             animator.SetInteger("orientation", 0);
+        }
+
         if (movement.y < 0)
+        {
             animator.SetInteger("orientation", 4);
+        }
     }
 
-    // -----------------------------------------------------------------------------------------
-    // Loads the sprites from a sprite sheet
     protected void LoadSpriteSheet()
     {
-        // Load the sprites from a sprite sheet file (png). 
-        // Note: The file specified must exist in a folder named Resources
         {
-            string spritesheetfolder = "";//Chars/";
+            string spritesheetfolder = "";
             string spritesheetfilepath = spritesheetfolder + WalkSpriteSheetName;
             var sprites = Resources.LoadAll<Sprite>(spritesheetfilepath);
-            Debug.Log("Loading " + spritesheetfilepath);
+
             this.WalkSpriteSheet = sprites.ToDictionary(x => x.name, x => x);
-      //      this.spriteRenderer.sprite = this.WalkSpriteSheet[this.spriteRenderer.sprite.name];
         }
         {
-            string spritesheetfolder = "";//Chars/";
+            string spritesheetfolder = "";
             string spritesheetfilepath = spritesheetfolder + AttackSpriteSheetName;
             var sprites = Resources.LoadAll<Sprite>(spritesheetfilepath);
-            Debug.Log("Loading " + spritesheetfilepath);
-       //     this.spriteRenderer.sprite = this.AttackSpriteSheet[this.spriteRenderer.sprite.name];
+
             this.AttackSpriteSheet = sprites.ToDictionary(x => x.name, x => x);
         }
-        // Remember the name of the sprite sheet in case it is changed later
-      //  this.LoadedSpriteSheetName = this.SpriteSheetName;
+    }
+
+    public virtual void TakeDamage(Weapon attackingWeapon)
+    {
+        if (health <= 0.0f)
+        {
+            return;
+        }
+
+        health -= attackingWeapon.DamageAmount;
+        if (health < 0.0f)
+        {
+            if (PlayDamageFX(attackingWeapon.DamageType, true) == false)
+            {
+                PlayDamageFX(attackingWeapon.DamageType, false);
+            }
+
+            Die();
+        }
+        else
+        {
+            PlayDamageFX(attackingWeapon.DamageType, false);
+        }
+    }
+
+    private bool PlayDamageFX(eDamageType damageType, bool bDeathFX)
+    {
+        foreach(var fx in damageFXList)
+        {
+            if (fx.damageType != damageType)
+            {
+                continue;
+            }
+
+            if (fx.isDeathFX != bDeathFX)
+            {
+                continue;
+            }
+
+            foreach(var prefab in fx.prefabsToSpawn)
+            {
+                if (prefab == null)
+                {
+                    continue;
+                }
+
+                GameObject newGameObj = Instantiate(prefab, gameObject.transform.parent.transform);
+                newGameObj.transform.position = gameObject.transform.position;
+                    
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsDead()
+    {
+        return health <= 0.0f;
+    }
+
+    private void Die()
+    {
+        Destroy(gameObject);
     }
 }
