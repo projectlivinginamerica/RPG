@@ -5721,6 +5721,49 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8486028450017120742, guid: d0b6c04e574686341b7fd64504a8f7c2, type: 3}
   m_PrefabInstance: {fileID: 8486028450736852634}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1556361633 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 72f847910d60a3f4398ee0b743fd97b0, type: 3}
+  m_PrefabInstance: {fileID: 63276589}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1556361634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1556361633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6baaeef69c6919842b11ea28ec40a87f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ScaleCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.020247063
+      value: 0.27362937
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.99762964
+      value: 1.0037568
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  ScaleDuration: 5
+  CurveMultiplier: 200
 --- !u!4 &1701441029 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8486028450017120742, guid: d0b6c04e574686341b7fd64504a8f7c2, type: 3}
